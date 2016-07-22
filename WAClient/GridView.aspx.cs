@@ -22,42 +22,25 @@ namespace WAClient
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            
-
-            //Thread thread = new Thread(Receive);
-            //thread.IsBackground = true;
-            //thread.Start(socketReceive);
-            
-         
         }
-        void Receive(object o)
+        void Receive(Socket socketRec)
         {
-            Socket socketRec = o as Socket;
             byte[] data = new byte[1024*1024*10];
             IPEndPoint listenPoint = new IPEndPoint(IPAddress.Any, 0);
             EndPoint remote = (EndPoint)listenPoint;
             int c = socketRec.ReceiveFrom(data, ref remote);
 
             DataSet ds = RetrieveDataSet(data);
-            this.GridView1.DataSource = ds;
-            this.GridView1.DataMember = "UserTable";
-           
-        }
-        public static DataSet RetrieveDataSet(byte[] binaryData)
-        {
-            MemoryStream memStream = new MemoryStream(binaryData);
-            memStream.Seek(0, SeekOrigin.Begin);
-            IFormatter formatter = new BinaryFormatter();
-            object o = formatter.Deserialize(memStream);
-            if (o is DataSet)
+          
+            for (int i = 0; i < ds.Tables[0].Columns.Count;i++ )
             {
-                DataSet dataSetResult = (DataSet)o;
-                return dataSetResult;
+                ds.Tables[0].Columns[i].ColumnMapping = MappingType.Hidden;
             }
-            else return null;
-
+            this.GridView1.DataSource = ds;
+            this.GridView1.DataBind();
+              
         }
-
+     
         protected void Button1_Click(object sender, EventArgs e)
         {
            
@@ -78,5 +61,20 @@ namespace WAClient
 
             Receive(socketReceive);
         }
+        public static DataSet RetrieveDataSet(byte[] binaryData)
+        {
+            MemoryStream memStream = new MemoryStream(binaryData);
+            memStream.Seek(0, SeekOrigin.Begin);
+            IFormatter formatter = new BinaryFormatter();
+            object o = formatter.Deserialize(memStream);
+            if (o is DataSet)
+            {
+                DataSet dataSetResult = (DataSet)o;
+                return dataSetResult;
+            }
+            else return null;
+
+        }
+
     }
 }

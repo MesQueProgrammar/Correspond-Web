@@ -102,25 +102,27 @@ namespace Server_UDP
                     byte[] dataArr = GetBinaryFormatDataSet((DataSet)dataGridView1.DataSource);
                     recSocket.SendTo(dataArr, dataArr.Length, SocketFlags.None, remote);
                 }
-
-                if (UserNameIsEqual(SelectUserName(str)))
+                else
                 {
-                    if (PasswordIsEqual(SelectUserName(str), SelectPassword(str)))
+                    if (UserNameIsEqual(SelectUserName(str)))
                     {
+                        if (PasswordIsEqual(SelectUserName(str), SelectPassword(str)))
+                        {
 
-                        byte[] loginSuccess = Encoding.UTF8.GetBytes("登录成功");
-                        recSocket.SendTo(loginSuccess, loginSuccess.Length, SocketFlags.None, remote);
+                            byte[] loginSuccess = Encoding.UTF8.GetBytes("登录成功");
+                            recSocket.SendTo(loginSuccess, loginSuccess.Length, SocketFlags.None, remote);
+                        }
+                        else
+                        {
+                            byte[] passwordError = Encoding.UTF8.GetBytes("密码错误");
+                            recSocket.SendTo(passwordError, passwordError.Length, SocketFlags.None, remote);
+                        }
                     }
                     else
                     {
-                        byte[] passwordError = Encoding.UTF8.GetBytes("密码错误");
-                        recSocket.SendTo(passwordError, passwordError.Length, SocketFlags.None, remote);
+                        byte[] userNameError = Encoding.UTF8.GetBytes("无效用户名");
+                        recSocket.SendTo(userNameError, userNameError.Length, SocketFlags.None, remote);
                     }
-                }
-                else
-                {
-                    byte[] userNameError = Encoding.UTF8.GetBytes("无效用户名");
-                    recSocket.SendTo(userNameError, userNameError.Length, SocketFlags.None, remote);
                 }
 
             }
